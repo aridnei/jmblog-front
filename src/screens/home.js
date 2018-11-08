@@ -2,6 +2,7 @@ import React from "react";
 import styled from "styled-components";
 
 import PostItem from "../components/post-item";
+import Loading from "../components/loading";
 
 const PageContent = styled.div`
   max-width: 664px;
@@ -14,13 +15,30 @@ const PageContent = styled.div`
 `;
 
 export default class Home extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      posts: [],
+      loading: false
+    };
+  }
+
+  componentDidMount() {}
+
   render() {
     return (
       <PageContent>
-        <PostItem />
-        <PostItem />
-        <PostItem />
-        <PostItem />
+        {this.state.loading ? (
+          <Loading />
+        ) : (
+          <React.Fragment>
+            <PostItem />
+            <PostItem />
+            <PostItem />
+            <PostItem />
+          </React.Fragment>
+        )}
       </PageContent>
     );
   }

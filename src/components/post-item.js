@@ -67,12 +67,12 @@ const PostItem = props => {
     <Wrapper>
       <Content>
         <PostLink />
-        <PostImage />
-        <PostTitle>
+        <PostImage name="post-image" />
+        <PostTitle name="post-title">
           Apocalyptic looks for your 2018 mood, from Rick Owens
         </PostTitle>
-        <PostDate>21 out 2018</PostDate>
-        <PostSummary>
+        <PostDate name="post-date">21 out 2018</PostDate>
+        <PostSummary name="post-summary">
           Alice was beginning to get very tired of sitting by her sister on the
           bank, and of having nothing to do: once or twice she had peeped into
           the book her sister was reading, but it had no pictures...
