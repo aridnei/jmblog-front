@@ -2,8 +2,6 @@ import React from "react";
 import styled from "styled-components";
 
 import postImage from "../assets/images/post-image.jpg";
-import Header from "../components/header";
-import Footer from "../components/footer";
 
 const PageContent = styled.div`
   max-width: 664px;

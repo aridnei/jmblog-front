@@ -28,7 +28,9 @@ const Logo = styled.img.attrs({
 const Header = props => {
   return (
     <Container>
-      <Logo />
+      <a href="/">
+        <Logo />
+      </a>
     </Container>
   );
 };

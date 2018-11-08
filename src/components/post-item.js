@@ -53,7 +53,7 @@ const Content = styled.div`
 `;
 
 const PostLink = styled.a.attrs({
-  href: "/post"
+  href: "/post/the-beauty-of-astronomy-is-that-anybody-can-do-it"
 })`
   position: absolute;
   left: 0;
