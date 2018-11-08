@@ -61,15 +61,9 @@ export default class SinglePost extends React.Component {
     console.log(this.props);
   }
 
-  componentDidMount() {
-    const query = this.props.location.search;
-    console.log(query);
-  }
-
   render() {
     return (
       <React.Fragment>
-        <Header />
         <PostImage />
         <PageContent>
           <PostTitle>
@@ -111,7 +105,6 @@ export default class SinglePost extends React.Component {
             </PostP>
           </PostContent>
         </PageContent>
-        <Footer />
       </React.Fragment>
     );
   }
