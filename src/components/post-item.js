@@ -1,7 +1,10 @@
 import React from "react";
 import styled from "styled-components";
+import Loading from "../components/loading";
+import { canvasToBlob } from "blob-util";
 
 import postImage from "../assets/images/post-image.jpg";
+import { dataURLToBlob } from "blob-util";
 
 const Wrapper = styled.div`
   max-width: 664px;
@@ -11,10 +14,9 @@ const Wrapper = styled.div`
 `;
 
 const PostImage = styled.img.attrs({
-  src: postImage
+  src: props => "data:image/jpeg;base64," + props.image
 })`
   max-width: 100%;
-  margin-bottom: 40px;
 `;
 
 const PostDate = styled.p`
@@ -53,7 +55,7 @@ const Content = styled.div`
 `;
 
 const PostLink = styled.a.attrs({
-  href: "/post/the-beauty-of-astronomy-is-that-anybody-can-do-it"
+  href: props => "/post/" + props.permalink
 })`
   position: absolute;
   left: 0;
@@ -62,20 +64,30 @@ const PostLink = styled.a.attrs({
   width: 100%;
 `;
 
+function formatDate(date) {
+  let d = new Date();
+
+  var options = {
+    year: "numeric",
+    month: "long",
+    day: "numeric"
+  };
+
+  return d.toLocaleDateString("pt-BR", options);
+}
+
 const PostItem = props => {
   return (
     <Wrapper>
       <Content>
-        <PostLink />
-        <PostImage name="post-image" />
-        <PostTitle name="post-title">
-          Apocalyptic looks for your 2018 mood, from Rick Owens
-        </PostTitle>
-        <PostDate name="post-date">21 out 2018</PostDate>
+        <PostLink permalink={props.data.permalink} />
+        <PostImage name="post-image" image={props.data.imageBase64} />
+        <PostTitle name="post-title">{props.data.title}</PostTitle>
+        <PostDate name="post-date">
+          {formatDate(props.data.datePublished)}
+        </PostDate>
         <PostSummary name="post-summary">
-          Alice was beginning to get very tired of sitting by her sister on the
-          bank, and of having nothing to do: once or twice she had peeped into
-          the book her sister was reading, but it had no pictures...
+          {props.data.summary + "..."}
         </PostSummary>
       </Content>
     </Wrapper>
