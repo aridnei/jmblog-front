@@ -3,6 +3,7 @@ import styled from "styled-components";
 
 import PostItem from "../components/post-item";
 import Loading from "../components/loading";
+import EmptyPosts from "../components/empty-posts";
 import { getPosts } from "../services/posts-api";
 
 const PageContent = styled.div`
@@ -41,9 +42,13 @@ export default class Home extends React.Component {
           <Loading />
         ) : (
           <React.Fragment>
-            {this.state.posts.map((p, index) => {
-              return <PostItem key={index} data={p} />;
-            })}
+            {this.state.posts.length > 0 ? (
+              this.state.posts.map((p, index) => {
+                return <PostItem key={index} data={p} />;
+              })
+            ) : (
+              <EmptyPosts />
+            )}
           </React.Fragment>
         )}
       </PageContent>
