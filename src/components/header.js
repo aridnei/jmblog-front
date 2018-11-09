@@ -6,6 +6,7 @@ const Container = styled.header`
   height: 90px;
   text-align: center;
   position: relative;
+  border-bottom: 1px solid #ebebeb;
 
   @media screen and (max-width: 767px) {
     height: 70px;
@@ -27,7 +28,9 @@ const Logo = styled.img.attrs({
 const Header = props => {
   return (
     <Container>
-      <Logo />
+      <a href="/">
+        <Logo />
+      </a>
     </Container>
   );
 };
