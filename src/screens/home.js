@@ -3,6 +3,7 @@ import styled from "styled-components";
 
 import PostItem from "../components/post-item";
 import Loading from "../components/loading";
+import { getPosts } from "../services/posts-api";
 
 const PageContent = styled.div`
   max-width: 664px;
@@ -20,11 +21,18 @@ export default class Home extends React.Component {
 
     this.state = {
       posts: [],
-      loading: false
+      loading: true
     };
   }
 
-  componentDidMount() {}
+  componentDidMount() {
+    getPosts(result => {
+      this.setState({
+        posts: result,
+        loading: false
+      });
+    });
+  }
 
   render() {
     return (
@@ -33,10 +41,9 @@ export default class Home extends React.Component {
           <Loading />
         ) : (
           <React.Fragment>
-            <PostItem />
-            <PostItem />
-            <PostItem />
-            <PostItem />
+            {this.state.posts.map((p, index) => {
+              return <PostItem key={index} data={p} />;
+            })}
           </React.Fragment>
         )}
       </PageContent>

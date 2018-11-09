@@ -2,6 +2,8 @@ import React from "react";
 import styled from "styled-components";
 
 import postImage from "../assets/images/post-image.jpg";
+import Loading from "../components/loading";
+import { getPost } from "../services/posts-api";
 
 const PageContent = styled.div`
   max-width: 664px;
@@ -35,7 +37,7 @@ const PostP = styled.p`
 `;
 
 const PostImage = styled.img.attrs({
-  src: postImage
+  src: props => "data:image/jpeg;base64," + props.image
 })`
   max-width: 100%;
 `;
@@ -53,56 +55,64 @@ const PostContent = styled.div`
   }
 `;
 
+function formatDate(date) {
+  let d = new Date(date);
+
+  var options = {
+    year: "numeric",
+    month: "long",
+    day: "numeric"
+  };
+
+  return d.toLocaleDateString("pt-BR", options);
+}
+
 export default class SinglePost extends React.Component {
   constructor(props) {
     super(props);
     console.log(this.props);
+    this.state = {
+      data: null,
+      loading: true
+    };
   }
+
+  componentDidMount() {
+    const permalink = this.props.match.params.id;
+
+    getPost(permalink, result => {
+      console.log(result);
+
+      this.setState({
+        data: result,
+        loading: false
+      });
+    });
+  }
+
+  formatContent() {}
 
   render() {
     return (
       <React.Fragment>
-        <PostImage />
-        <PageContent>
-          <PostTitle>
-            The beauty of astronomy is that anybody can do it
-          </PostTitle>
-          <PostDate>12 out 2018</PostDate>
-          <PostContent>
-            <PostP>
-              There is a lot of exciting stuff going on in the stars above us
-              that makes astronomy so much fun. The universe is constantly
-              changing and moving. Some would say it’s a living thing because
-              you never know what you are going to see on any given night of
-              stargazing.
-            </PostP>
-            <PostP>
-              Of the many celestial phenomenons, there is probably none as
-              exciting as when you see your first asteroid on the move in the
-              heavens. To call asteroids the “rock stars” of astronomy is both a
-              bad joke and an accurate depiction of how astronomy fans view
-              them. Unlike suns, planets, and moons, asteroids are on the move,
-              ever changing and, if they appear in the night sky, they are
-              exciting and dynamic.
-            </PostP>
-            <PostP>
-              There is a lot of exciting stuff going on in the stars above us
-              that makes astronomy so much fun. The universe is constantly
-              changing and moving. Some would say it’s a “living” thing because
-              you never know what you are going to see on any given night of
-              stargazing.
-            </PostP>
-            <PostP>
-              Of the many celestial phenomenons, there is probably none as
-              exciting as when you see your first asteroid on the move in the
-              heavens. To call asteroids the “rock stars” of astronomy is both a
-              bad joke and an accurate depiction of how astronomy fans view
-              them. Unlike suns, planets, and moons, asteroids are on the move,
-              ever-changing, and, if they appear in the night sky, they are
-              exciting and dynamic.
-            </PostP>
-          </PostContent>
-        </PageContent>
+        {this.state.loading ? (
+          <PageContent>
+            <Loading />
+          </PageContent>
+        ) : (
+          <React.Fragment>
+            <PostImage image={this.state.data.imageBase64} />
+            <PageContent>
+              <PostTitle>{this.state.data.title}</PostTitle>
+              <PostDate>{formatDate(this.state.data.datePublished)}</PostDate>
+              <PostContent>
+                <PostP
+                  dangerouslySetInnerHTML={{ __html: this.state.data.text }}
+                />
+              </PostContent>
+            </PageContent>
+          </React.Fragment>
+        )}
       </React.Fragment>
     );
   }
