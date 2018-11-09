@@ -39,7 +39,7 @@ const PostP = styled.p`
 const PostImage = styled.img.attrs({
   src: props => "data:image/jpeg;base64," + props.image
 })`
-  max-width: 100%;
+  width: 100%;
 `;
 
 const PostDate = styled.p`
