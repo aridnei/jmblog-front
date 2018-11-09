@@ -20,6 +20,7 @@ const Copyright = styled.p`
 const Footer = props => {
   return (
     <React.Fragment>
+      <InstagramWidget hashtag="#parafazeracontecer" />
       <Container>
         <Copyright>©2018 Made with ❤ in Jota</Copyright>
       </Container>

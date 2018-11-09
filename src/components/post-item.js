@@ -11,6 +11,10 @@ const Wrapper = styled.div`
   margin-left: auto;
   margin-right: auto;
   margin-bottom: 80px;
+
+  @media screen and (max-width: 767px) {
+    margin-bottom: 0;
+  }
 `;
 
 const PostImage = styled.img.attrs({

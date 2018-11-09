@@ -19,6 +19,14 @@ const GlobalStyle = createGlobalStyle`
     font-family: "Raleway", sans-serif;
     box-sizing: border-box;
   }
+
+  @media screen and (max-width: 767px){
+    #instawidget{
+      height: 250px!important;
+    }
+  }
+  
+
 `;
 
 ReactDOM.render(
