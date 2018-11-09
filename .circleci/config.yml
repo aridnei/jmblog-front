@@ -31,22 +31,20 @@ jobs:
           # fallback to using the latest cache if no exact match is found
           - v1-dependencies-
 
-      # - run: yarn install
-
       - save_cache:
           paths:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
 
-      # - attach_workspace:
-      #     at: .
+      - attach_workspace:
+          at: .
 
       - run: CI=false npm run build
 
-      # - persist_to_workspace:
-      #     root: .
-      #     paths:
-      #       - build
+      - persist_to_workspace:
+          root: .
+          paths:
+            - build
 
       # run tests!
       # - run: yarn test
@@ -55,4 +53,4 @@ jobs:
       - run: sudo python get-pip.py
       - run: sudo pip install awscli --upgrade
       - run: aws --version
-      - run: aws s3 sync public/ s3://app-jmblog-front-test2 --delete
+      - run: aws s3 sync build/ s3://app-jmblog-front-test2 --delete
