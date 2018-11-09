@@ -7,8 +7,12 @@ export function getPosts(callback) {
 
   xmlHttp.onreadystatechange = function() {
     if (xmlHttp.readyState == 4) {
-      let result = JSON.parse(xmlHttp.responseText);
-      callback(result);
+      if (xmlHttp.responseText) {
+        let result = JSON.parse(xmlHttp.responseText);
+        callback(result);
+      } else {
+        callback([]);
+      }
     }
   };
 
@@ -22,8 +26,12 @@ export function getPost(permalink, callback) {
 
   xmlHttp.onreadystatechange = function() {
     if (xmlHttp.readyState == 4) {
-      let result = JSON.parse(xmlHttp.responseText);
-      callback(result);
+      if (xmlHttp.responseText) {
+        let result = JSON.parse(xmlHttp.responseText);
+        callback(result);
+      } else {
+        callback([]);
+      }
     }
   };
 
