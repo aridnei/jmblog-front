@@ -42,7 +42,7 @@ export default class Home extends React.Component {
         ) : (
           <React.Fragment>
             {this.state.posts.map((p, index) => {
-              return <PostItem key={index} data={p} image={"e"} />;
+              return <PostItem key={index} data={p} />;
             })}
           </React.Fragment>
         )}

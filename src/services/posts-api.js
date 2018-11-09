@@ -15,7 +15,7 @@ export function getPosts(callback) {
 
 export function getPost(permalink, callback) {
   let xmlHttp = new XMLHttpRequest();
-  const apiURL = "https://localhost:5001/api/post/permalink" + permalink;
+  const apiURL = "https://localhost:5001/api/post/permalink/" + permalink;
 
   xmlHttp.onreadystatechange = function() {
     if (xmlHttp.readyState == 4) {
