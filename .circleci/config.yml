@@ -38,15 +38,15 @@ jobs:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
 
-      - attach_workspace:
-          at: .
+      # - attach_workspace:
+      #     at: .
 
       - run: npm run build
 
-      - persist_to_workspace:
-          root: .
-          paths:
-            - build
+      # - persist_to_workspace:
+      #     root: .
+      #     paths:
+      #       - build
 
       # run tests!
       # - run: yarn test
