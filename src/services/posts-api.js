@@ -1,6 +1,9 @@
+const apiURL =
+  "http://test-jmblog-api-425578905.us-east-2.elb.amazonaws.com/api";
+
 export function getPosts(callback) {
   let xmlHttp = new XMLHttpRequest();
-  const apiURL = "https://localhost:5001/api/post";
+  const requestURL = apiURL + "/post";
 
   xmlHttp.onreadystatechange = function() {
     if (xmlHttp.readyState == 4) {
@@ -9,13 +12,13 @@ export function getPosts(callback) {
     }
   };
 
-  xmlHttp.open("GET", apiURL, true);
+  xmlHttp.open("GET", requestURL, true);
   xmlHttp.send(null);
 }
 
 export function getPost(permalink, callback) {
   let xmlHttp = new XMLHttpRequest();
-  const apiURL = "https://localhost:5001/api/post/permalink/" + permalink;
+  const requestURL = apiURL + "/post/permalink/" + permalink;
 
   xmlHttp.onreadystatechange = function() {
     if (xmlHttp.readyState == 4) {
@@ -24,6 +27,6 @@ export function getPost(permalink, callback) {
     }
   };
 
-  xmlHttp.open("GET", apiURL, true);
+  xmlHttp.open("GET", requestURL, true);
   xmlHttp.send(null);
 }
