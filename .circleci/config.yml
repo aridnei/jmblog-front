@@ -24,6 +24,9 @@ jobs:
     steps:
       - checkout
 
+      - setup_remote_docker:   # (2)
+          docker_layer_caching: true # (3)
+
       # Download and cache dependencies
       - restore_cache:
           keys:
@@ -56,3 +59,17 @@ jobs:
       - run: sudo pip install awscli --upgrade
       - run: aws --version
       - run: aws s3 sync build/ s3://app-jmblog-front-test --delete --acl public-read
+      - run:
+          name: Build application Docker image
+          command: |
+            cd build/
+            docker image build -t jmblog-front .
+      - deploy:
+          name: Push application Docker image
+          command: |
+            if [ "${CIRCLE_BRANCH}" == "master" ]; then
+              login="$(aws ecr get-login --region=$AWS_DEFAULT_REGION --no-include-email)"
+              ${login}
+              docker tag jmblog-front "${ECR_ENDPOINT}:${CIRCLE_SHA1}"
+              docker push "${ECR_ENDPOINT}:${CIRCLE_SHA1}"
+            fi
