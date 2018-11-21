@@ -62,7 +62,7 @@ jobs:
       - run:
           name: Build application Docker image
           command: |
-            cd build/
+            cd ..
             docker image build -t jmblog-front .
       - deploy:
           name: Push application Docker image
