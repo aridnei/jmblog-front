@@ -1,5 +1,5 @@
 const apiURL =
-  "http://test-jmblog-api-425578905.us-east-2.elb.amazonaws.com/api";
+  "http://jmblog-api/api";
 
 export function getPosts(callback) {
   let xmlHttp = new XMLHttpRequest();

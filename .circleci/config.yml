@@ -25,7 +25,7 @@ jobs:
       - checkout
 
       - setup_remote_docker:   # (2)
-          docker_layer_caching: true # (3)
+          docker_layer_caching: false # (3)
 
       # Download and cache dependencies
       - restore_cache:
@@ -65,6 +65,7 @@ jobs:
             pwd
             ls -la
             docker image build -t jmblog-front .
+            docker images
       - deploy:
           name: Push application Docker image
           command: |
@@ -72,5 +73,6 @@ jobs:
               login="$(aws ecr get-login --region=$AWS_DEFAULT_REGION --no-include-email)"
               ${login}
               docker tag jmblog-front "${ECR_ENDPOINT}:${CIRCLE_SHA1}"
+              docker images
               docker push "${ECR_ENDPOINT}:${CIRCLE_SHA1}"
             fi
