@@ -42,7 +42,7 @@ spec:
     spec:
       containers:
       - name: nginx
-        image: "324148959017.dkr.ecr.us-east-2.amazonaws.com/repo-jmblog-front-test:af6758df831ad3e2623cfdbbdb87c5cdb9d01d55"
+        image: "324148959017.dkr.ecr.us-east-2.amazonaws.com/repo-jmblog-front-test:c3d232de2193914393b169bb10152c97b475b59c"
         ports:
           - name: http
             containerPort: 80
