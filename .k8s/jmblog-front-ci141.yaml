@@ -1,0 +1,60 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: jmblog
+  labels:
+    app: jmblog
+    tier: frontend
+spec:
+  ports:
+    - protocol: "TCP"
+      port: 8080
+      targetPort: http
+  type: LoadBalancer
+  selector:
+    app: jmblog
+    tier: frontend
+    version: v0.1.0-ci141
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jmblog-ci141
+  labels:
+    app: jmblog
+    tier: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jmblog
+      version: v0.1.0-ci141
+      tier: frontend
+      environment: qas
+  template:
+    metadata:
+      labels:
+        app: jmblog
+        version: v0.1.0-ci141
+        tier: frontend
+        environment: qas
+      annotations:
+        version: "verificar no futuro!"
+    spec:
+      containers:
+      - name: nginx
+        image: "324148959017.dkr.ecr.us-east-2.amazonaws.com/repo-jmblog-front-test:c3d232de2193914393b169bb10152c97b475b59c"
+        ports:
+          - name: http
+            containerPort: 80
+        resources:      
+          requests:        
+            cpu: 200m
+            memory: 128Mi
+        env:    
+          - name: ENV_VAR01
+            value: var01_value    
+          - name: ENV_VAR02
+            value: var01_value
+      imagePullSecrets:
+        - name: myregistrykey

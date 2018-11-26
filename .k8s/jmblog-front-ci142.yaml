@@ -1,44 +1,45 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: jmblog
+  name: jmblog-ci142
   labels:
     app: jmblog
     tier: frontend
 spec:
+  ports:
+    - protocol: "TCP"
+      port: 8080
+      targetPort: http
+  type: LoadBalancer
   selector:
     app: jmblog
     tier: frontend
-  ports:
-  - protocol: "TCP"
-    port: 8080
-    targetPort: 80
-  type: LoadBalancer
+    version: v0.1.0-ci142
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: jmblog
+  name: jmblog-ci142
   labels:
     app: jmblog
     tier: frontend
 spec:
+  replicas: 1
   selector:
     matchLabels:
       app: jmblog
+      version: v0.1.0-ci142
       tier: frontend
-      track: stable
       environment: qas
-  replicas: 1
   template:
     metadata:
       labels:
         app: jmblog
+        version: v0.1.0-ci142
         tier: frontend
-        track: stable
         environment: qas
       annotations:
-        version: "0.0.1"
+        version: "verificar no futuro!"
     spec:
       containers:
       - name: nginx

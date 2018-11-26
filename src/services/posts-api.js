@@ -1,5 +1,4 @@
-const apiURL =
-  "http://test-jmblog-api-425578905.us-east-2.elb.amazonaws.com/api";
+const apiURL = "http://localhost:8090/api";
 
 export function getPosts(callback) {
   let xmlHttp = new XMLHttpRequest();
