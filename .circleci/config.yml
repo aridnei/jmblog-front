@@ -19,16 +19,16 @@ jobs:
           keys: 
             - dep-cache-{{ checksum "package.json" }}
             - dep-cache
-     - run:
+      - run:
         yarn install --network-concurrency 1
-     - save_cache:
+      - save_cache:
           key: dep-cache-{{ checksum "package.json" }}
           paths:
             - node_modules
             - ~/.npm
             - ~/.cache
             - /root/.cache/
-     - persist_to_workspace:
+      - persist_to_workspace:
           root: /tmp/persist_to_workspace
           paths:
             - .
