@@ -19,8 +19,7 @@ jobs:
           keys: 
             - dep-cache-{{ checksum "package.json" }}
             - dep-cache
-      - run:
-        yarn install --network-concurrency 1
+      - run: yarn install --network-concurrency 1
       - save_cache:
           key: dep-cache-{{ checksum "package.json" }}
           paths:
