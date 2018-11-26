@@ -100,11 +100,16 @@ jobs:
           name: Push application Docker image
           command: |
             if [ "${CIRCLE_BRANCH}" == "master" ]; then
+              CIRCLE_BUILD_DOCKER=$(cat DOCKER_IMAGE.txt)
+              export AWS_REPO=$(cat deploy-definitions.json | jq --raw-output '.aws_repo')
+              export AWS_REGION=$(cat deploy-definitions.json | jq --raw-output '.aws_region')
+              export GITHUB_VERSION=$(cat deploy-definitions.json | jq --raw-output '.github_version')
+              echo "$AWS_REPO:$GITHUB_VERSION-ci$CIRCLE_BUILD_DOCKER"
               login="$(aws ecr get-login --region=$AWS_DEFAULT_REGION --no-include-email)"
               ${login}
-              docker tag jmblog-front "${ECR_ENDPOINT}:${CIRCLE_SHA1}"
+              # docker tag jmblog-front "${ECR_ENDPOINT}:${CIRCLE_SHA1}"
               docker images
-              docker push "${ECR_ENDPOINT}:${CIRCLE_SHA1}"
+              docker push "$AWS_REPO:$GITHUB_VERSION-ci$CIRCLE_BUILD_DOCKER"
             fi
       - deploy:
           name: AWS - Pushing to Quality Environment
@@ -129,17 +134,13 @@ workflows:
     jobs:
       - checkout:
           context: JMBlog
-      - pre-build-qas:
-          context: JMBlog
-          requires:
-            - checkout
       - build-stg:
           context: JMBlog
           filters:
             branches: { only: 'master' }   # Ignore all branches except master
             tags: { only: '/.*/' }         # All tags
           requires:
-            - pre-build-qas
+            - checkout
       - create-release:
           context: GitJMSeguradora
           requires:
