@@ -70,7 +70,7 @@ jobs:
           command: |
             if [ "${CIRCLE_BRANCH}" == "master" ]; then
               sudo apt-get update
-              sido apt-get install -y jq
+              sudo apt-get install -y jq
               AWS_REPO=$(cat deploy-definitions.json | jq --raw-output '.aws_repo')
               GITHUB_VERSION=$(cat deploy-definitions.json | jq --raw-output '.github_version')
               AWS_DEFAULT_REGION=$(cat deploy-definitions.json | jq --raw-output '.aws_region')
