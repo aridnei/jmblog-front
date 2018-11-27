@@ -1,0 +1,169 @@
+version: 2
+defaults: &defaults
+    working_directory: /tmp/persist_to_workspace
+    docker:
+      # the Docker image with Cypress dependencies
+      - image: cypress/base:10
+        environment:
+          ## this enables colors in the output
+          TERM: xterm
+
+jobs:
+  checkout:
+    <<: *defaults
+    steps:
+      - checkout
+      - run: pwd
+      - run: ls -lart
+      - restore_cache:
+          keys: 
+            - dep-cache-{{ checksum "package.json" }}
+            - dep-cache
+      - run: yarn install --network-concurrency 1
+      - save_cache:
+          key: dep-cache-{{ checksum "package.json" }}
+          paths:
+            - node_modules
+            - ~/.npm
+            - ~/.cache
+            - /root/.cache/
+      - persist_to_workspace:
+          root: /tmp/persist_to_workspace
+          paths:
+            - .
+
+  build-stg:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: /tmp/persist_to_workspace
+      - setup_remote_docker:
+          docker_layer_caching: false
+      - run:
+          name: Build
+          command: |
+            apt-get update
+            apt-get install -y jq
+            CI="false"
+            npm run build
+            cd /tmp/persist_to_workspace
+            export AWS_REPO=$(cat deploy-definitions.json | jq --raw-output '.aws_repo')
+            export GITHUB_VERSION=$(cat deploy-definitions.json | jq --raw-output '.github_version')
+            echo "$AWS_REPO"
+            echo "$AWS_REPO:$GITHUB_VERSION-ci$CIRCLE_BUILD_NUM"
+            docker build -t $AWS_REPO:$GITHUB_VERSION-ci$CIRCLE_BUILD_NUM .
+            docker image ls
+            echo "$CIRCLE_BUILD_NUM" > DOCKER_IMAGE.txt
+            echo "Done"
+          # no_output_timeout: 5m
+      - persist_to_workspace:
+          root: /tmp/persist_to_workspace
+          paths:
+            - build/*
+
+  create-release:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: /tmp/persist_to_workspace
+      - setup_remote_docker:
+          docker_layer_caching: false
+      - run: pwd
+      - run: ls -lart
+      - run:
+          name: Creating a New Release on GitHub
+          command: |
+            apt-get update
+            apt-get install -y wget tar zip jq
+            wget -qO- https://github.com/tcnksm/ghr/releases/download/v0.10.2/ghr_v0.10.2_linux_amd64.tar.gz | tar --transform 's/^ghr_v0.10.2_linux_amd64/ghr/' -xvz
+            mkdir -p releases
+            CIRCLE_BUILD_DOCKER=$(cat DOCKER_IMAGE.txt)
+            export AWS_REPO=$(cat deploy-definitions.json | jq --raw-output '.aws_repo')
+            export GITHUB_VERSION=$(cat deploy-definitions.json | jq --raw-output '.github_version')
+            echo "$AWS_REPO:$GITHUB_VERSION-ci$CIRCLE_BUILD_DOCKER" > releases/Docker.txt
+            tar -czpvf build_$GITHUB_VERSION-CI$CIRCLE_BUILD_NUM.tar.gz build/
+            zip -r build_$GITHUB_VERSION-CI$CIRCLE_BUILD_NUM.zip build/
+            mv -v build_$GITHUB_VERSION-CI$CIRCLE_BUILD_NUM.tar.gz releases/
+            mv -v build_$GITHUB_VERSION-CI$CIRCLE_BUILD_NUM.zip releases/
+            ghr/ghr -t $GITHUB_TOKEN -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME $GITHUB_VERSION-CI$CIRCLE_BUILD_NUM releases/
+          # no_output_timeout: 5m
+
+  deploy-qas:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: /tmp/persist_to_workspace
+      - setup_remote_docker:
+          docker_layer_caching: false
+      - run: pwd
+      - run: ls -lart
+      - build:
+          name: Build application Docker image
+          command: |
+            pwd
+            ls -la
+            docker image build -t jmblog-front .
+            docker images
+      - deploy:
+          name: Push application Docker image
+          command: |
+            if [ "${CIRCLE_BRANCH}" == "master" ]; then
+              sudo apt-get update
+              sudo apt-get install -y jq
+              sudo apt-get install -y --no-install-recommends ca-certificates
+              sudo apt-get install -y build-essential awscli python3-pip software-properties-common apt-transport-https #python-software-properties
+              sudo pip3 install --upgrade awscli
+              CIRCLE_BUILD_DOCKER=$(cat DOCKER_IMAGE.txt)
+              AWS_REPO=$(cat deploy-definitions.json | jq --raw-output '.aws_repo')
+              AWS_REGION=$(cat deploy-definitions.json | jq --raw-output '.aws_region')
+              GITHUB_VERSION=$(cat deploy-definitions.json | jq --raw-output '.github_version')
+              login="$(aws ecr get-login --region=$AWS_DEFAULT_REGION --no-include-email)"
+              ${login}
+              docker build -t $AWS_REPO:$GITHUB_VERSION-ci$CIRCLE_BUILD_DOCKER .
+              docker images
+              docker push "$AWS_REPO:$GITHUB_VERSION-ci$CIRCLE_BUILD_DOCKER"
+            fi
+      # - deploy:
+      #     name: AWS - Pushing to Quality Environment
+      #     command: |
+      #       CI="false"
+      #       apt-get install -y build-essential awscli python3-pip software-properties-common apt-transport-https jq 
+      #       pip3 install --upgrade awscli
+      #       if [ "$CIRCLE_BRANCH" != "master" ]; then
+      #           echo "Push/Sync application to S3"
+      #           # Push application
+      #           cd build
+      #           aws s3 sync . s3://$AWS_S3_QAS
+      #           else
+      #           echo "This code has not been published to S3"
+      #           fi
+      #       echo "Done"
+      #     no_output_timeout: 5m
+
+workflows:
+  version: 2
+  workflow-project:
+    jobs:
+      - checkout:
+          context: JMBlog
+      - build-stg:
+          context: JMBlog
+          filters:
+            branches: { only: 'master' }   # Ignore all branches except master
+            tags: { only: '/.*/' }         # All tags
+          requires:
+            - checkout
+      - create-release:
+          context: GitJMSeguradora
+          requires:
+            - build-stg
+          filters:
+            branches: { only: 'master' }   # Ignore all branches except master
+            tags: { only: '/.*/' }         # All tags
+      # - deploy-qas:
+      #     context: GitJMSeguradora
+      #     filters:
+      #       branches: { ignore: 'master' }   # Ignore all branches except master
+      #       tags: { only: '/.*/' }         # All tags
+      #     requires:
+      #       - create-release
